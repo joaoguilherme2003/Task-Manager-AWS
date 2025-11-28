@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Minimal SAM project with Node.js 20 + TypeScript (manual tsc build)
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    CodeUri: dist
+    Architectures:
+      - x86_64
+    MemorySize: 128
+    Timeout: 10
+
+Resources:
+  ###############################################################
+  # GET /ping → Simple healthcheck endpoint
+  ###############################################################
+  PingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # CodeUri vem do Globals (dist/)
+      Handler: handlers/ping.handler
+      Description: Simple ping endpoint using TypeScript
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /ping
+            Method: GET
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL (Prod stage)
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/ping"
